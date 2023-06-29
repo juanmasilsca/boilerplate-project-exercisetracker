@@ -60,11 +60,17 @@ router.post('/users/:_id/exercises', async (req, res) => {
   }
 })
 
+const formatDate = (date) => {
+  return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+}
+
 router.get('/users/:_id/logs', async (req, res) => {
   let id = req.params._id;
-  const limit = req.query.limit? req.query.limit : 100;
-  const from = req.query.from? req.query.from : new Date('yyyy-mm-dd');
-  const to = req.query.to? req.query.to : new Date('yyyy-mm-dd');
+  const limit = req.query.limit? Number(req.query.limit) : 100;
+  const from = req.query.from? req.query.from : formatDate(new Date(-8640000000000000));
+  const to = req.query.to? req.query.to : formatDate(new Date(8640000000000000));
+  console.log(limit, from, to);
+  console.log("2023-06-01" >= from);
   try {
     let logs = await Usuario.aggregate([
       { $match : { _id : new mongoose.Types.ObjectId(id) } },
@@ -78,9 +84,13 @@ router.get('/users/:_id/logs', async (req, res) => {
             as: "item",
             cond: {
               $and: [
-                { $gt: [ "$$item.date", new Date(from)]},
-                { $lt: [ "$$item.date", new Date(to)]}
-              ]
+                {
+                  $gte: [ "$$item.date", from ]
+                },
+                {
+                  $lte: [ "$$item.date", to ]
+                }
+              ] 
             },
             limit: Number(limit)
           }
