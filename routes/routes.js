@@ -39,7 +39,7 @@ router.post('/users/:_id/exercises', async (req, res) => {
     //userId: id,
     description: req.body.description,
     duration: req.body.duration,
-    date: req.body.date || new Date().toDateString()
+    date: req.body.date || formatDate(new Date())
   })
   try {
     const userToSave = await Usuario.findByIdAndUpdate(
