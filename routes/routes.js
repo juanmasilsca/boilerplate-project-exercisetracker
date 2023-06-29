@@ -62,10 +62,9 @@ router.post('/users/:_id/exercises', async (req, res) => {
 
 router.get('/users/:_id/logs', async (req, res) => {
   let id = req.params._id;
-  const limit = req.query.limit;
-  const from = req.query.from;
-  const to = req.query.to;
-  console.log(`${from} / ${to}`);
+  const limit = req.query.limit? req.query.limit : 100;
+  const from = req.query.from? req.query.from : new Date('yyyy-mm-dd');
+  const to = req.query.to? req.query.to : new Date('yyyy-mm-dd');
   try {
     let logs = await Usuario.aggregate([
       { $match : { _id : new mongoose.Types.ObjectId(id) } },
@@ -79,8 +78,8 @@ router.get('/users/:_id/logs', async (req, res) => {
             as: "item",
             cond: {
               $and: [
-                { $gt: [ "$$item.date", new Date('2023-06-25')]},
-                { $lt: [ "$$item.date", new Date('2023-06-28')]}
+                { $gt: [ "$$item.date", new Date(from)]},
+                { $lt: [ "$$item.date", new Date(to)]}
               ]
             },
             limit: Number(limit)
