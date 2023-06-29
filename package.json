@@ -9,13 +9,16 @@
 	"dependencies": {
 		"cors": "^2.8.5",
 		"dotenv": "^8.6.0",
-		"express": "^4.16.4",
+		"express": "^4.18.2",
 		"mongoose": "^7.3.1"
 	},
 	"repository": {
 		"url": "https://github.com/freeCodeCamp/boilerplate-project-exercisetracker"
 	},
 	"license": "MIT",
+	"engines" : { 
+    "node" : ">=14.20.1" 
+  },
 	"keywords": [
 		"node",
 		"express"
