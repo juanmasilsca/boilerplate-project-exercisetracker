@@ -11,18 +11,17 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 
 // Post Method
-router.post('/users', async (req, res) => {
-  const user = new Usuario({
-    username: req.body.username,
-    // log: [{}]
-  })
-  try {
-    const userToSave = await user.save();
-    res.status(200).json.stringify(userToSave);
-  } catch (error) {
-    res.status(400).json({ message: error.message })
-  }
-})
+// router.post('/users', async (req, res) => {
+//   const user = new Usuario({
+//     username: req.body.username,
+//   })
+//   try {
+//     const userToSave = await user.save();
+//     res.status(200).json.stringify(userToSave);
+//   } catch (error) {
+//     res.status(400).json({ message: error.message })
+//   }
+// })
 
 router.get('/users', async (req, res) => {
   try {

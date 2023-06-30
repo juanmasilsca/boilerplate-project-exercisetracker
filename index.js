@@ -3,6 +3,8 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 require('./db');
 
@@ -15,25 +17,15 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
-// const Schema = mongoose.Schema;
+let users = [];
+let idCounter = 0;
 
-// const usuarioSchema = new Schema({
-//   username: { type: String, required: true }
-// });
+app.post('/api/users', function (req, res) {
+  let newUser = { _id: ++idCounter, username: req.body.username };
+  users.push(newUser);
+  return res.json(newUser);
 
-// const Usuario = mongoose.model('Usuario', usuarioSchema);
-
-// app.post('/api/users', async (req, res) => {
-//   const user = new Usuario({
-//     username: req.body.username
-//   });
-//   try {
-//     const userToSave = await user.save();
-//     res.json(userToSave);
-//   } catch (error) {
-//     res.status(400).json({message: err.message})
-//   }
-// })
+})
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
