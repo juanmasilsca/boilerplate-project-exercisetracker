@@ -36,7 +36,7 @@ app.post('/api/users', async (req, res) => {
 app.get('/api/users', async (req, res) => {
   try {
     const users = await Usuario.find({},{__v: 0, log: 0});
-    res.json(users);
+    res.status(200).json(users);
   } catch (error) {
     res.status(500).json({message: error.message});
   }
