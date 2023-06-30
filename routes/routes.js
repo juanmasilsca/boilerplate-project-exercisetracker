@@ -18,7 +18,7 @@ router.post('/users', async (req, res) => {
   })
   try {
     const userToSave = await user.save();
-    res.json({username: userToSave.username, _id: userToSave._id});
+    res.status(200).json.stringify(userToSave);
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
