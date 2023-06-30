@@ -80,37 +80,34 @@ app.get('/api/users/:_id/logs', async (req, res) => {
   const limit = req.query.limit? Number(req.query.limit) : 100;
   const from = req.query.from? req.query.from : formatDate(new Date(-8640000000000000));
   const to = req.query.to? req.query.to : formatDate(new Date(8640000000000000));
-  console.log(limit, from, to);
-  console.log("2023-06-01" >= from);
   try {
     let logs = await Usuario.aggregate([
       { $match : { _id : new mongoose.Types.ObjectId(id) } },
       { $project: {
         username: 1,
         count: { $size: "$log" },
-        _id: 1,
-        log: 1 
-        // log: {
-        //   $filter: {
-        //     input: "$log",
-        //     as: "item",
-        //     cond: {
-        //       $and: [
-        //         {
-        //           $gte: [ "$$item.date", from ]
-        //         },
-        //         {
-        //           $lte: [ "$$item.date", to ]
-        //         }
-        //       ] 
-        //     },
-        //     limit: Number(limit)
-        //   }
-        // } 
+        _id: 1, 
+        log: {
+          $filter: {
+            input: "$log",
+            as: "item",
+            cond: {
+              $and: [
+                {
+                  $gte: [ "$$item.date", from ]
+                },
+                {
+                  $lte: [ "$$item.date", to ]
+                }
+              ] 
+            },
+            limit: Number(limit)
+          }
+        } 
       }},
       { $unset: "log._id"}
     ]);
-    res.status(200).json(logs);
+    res.send(logs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
