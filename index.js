@@ -54,7 +54,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     //userId: id,
     description: req.body.description,
     duration: req.body.duration,
-    date: req.body.date || formatDate(new Date())
+    date: new Date(req.body.date).toDateString() || new Date().toDateString()
   })
   try {
     const userToSave = await Usuario.findByIdAndUpdate(
@@ -65,7 +65,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       username: userToSave.username,
       description: ejercicio.description,
       duration: ejercicio.duration,
-      date: new Date(ejercicio.date).toDateString(),
+      date: ejercicio.date,
       _id: userToSave._id
     });
     // const ejeToSave = await ejercicio.save();
@@ -107,7 +107,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       }},
       { $unset: "log._id"}
     ]);
-    console.log(logs[0]);
+    logs[0].log.f
     res.send(logs[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
