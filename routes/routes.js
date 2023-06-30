@@ -23,41 +23,41 @@ router.use(bodyParser.json());
 //   }
 // })
 
-router.get('/users', async (req, res) => {
-  try {
-    const users = await Usuario.find({},{__v: 0, log: 0});
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({message: error.message});
-  }
-})
+// router.get('/users', async (req, res) => {
+//   try {
+//     const users = await Usuario.find({},{__v: 0, log: 0});
+//     res.json(users);
+//   } catch (error) {
+//     res.status(500).json({message: error.message});
+//   }
+// })
 
-router.post('/users/:_id/exercises', async (req, res) => {
-  const id = req.params._id;
-  const ejercicio = new Ejercicio({
-    //userId: id,
-    description: req.body.description,
-    duration: req.body.duration,
-    date: req.body.date || formatDate(new Date())
-  })
-  try {
-    const userToSave = await Usuario.findByIdAndUpdate(
-      { _id: id },
-      { $push: { log: ejercicio } }
-    );
-    res.status(200).json({ 
-      username: userToSave.username,
-      description: ejercicio.description,
-      duration: ejercicio.duration,
-      date: ejercicio.date, 
-      _id: id, 
-    });
-    // const ejeToSave = await ejercicio.save();
-    // res.status(200).json(userToSave);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-})
+// router.post('/users/:_id/exercises', async (req, res) => {
+//   const id = req.params._id;
+//   const ejercicio = new Ejercicio({
+//     //userId: id,
+//     description: req.body.description,
+//     duration: req.body.duration,
+//     date: req.body.date || formatDate(new Date())
+//   })
+//   try {
+//     const userToSave = await Usuario.findByIdAndUpdate(
+//       { _id: id },
+//       { $push: { log: ejercicio } }
+//     );
+//     res.status(200).json({ 
+//       username: userToSave.username,
+//       description: ejercicio.description,
+//       duration: ejercicio.duration,
+//       date: ejercicio.date, 
+//       _id: id, 
+//     });
+//     // const ejeToSave = await ejercicio.save();
+//     // res.status(200).json(userToSave);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// })
 
 const formatDate = (date) => {
   return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
