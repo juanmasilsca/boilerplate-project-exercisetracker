@@ -88,24 +88,25 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       { $project: {
         username: 1,
         count: { $size: "$log" },
-        _id: 1, 
-        log: {
-          $filter: {
-            input: "$log",
-            as: "item",
-            cond: {
-              $and: [
-                {
-                  $gte: [ "$$item.date", from ]
-                },
-                {
-                  $lte: [ "$$item.date", to ]
-                }
-              ] 
-            },
-            limit: Number(limit)
-          }
-        } 
+        _id: 1,
+        log: 1 
+        // log: {
+        //   $filter: {
+        //     input: "$log",
+        //     as: "item",
+        //     cond: {
+        //       $and: [
+        //         {
+        //           $gte: [ "$$item.date", from ]
+        //         },
+        //         {
+        //           $lte: [ "$$item.date", to ]
+        //         }
+        //       ] 
+        //     },
+        //     limit: Number(limit)
+        //   }
+        // } 
       }},
       { $unset: "log._id"}
     ]);
