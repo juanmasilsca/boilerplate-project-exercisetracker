@@ -20,6 +20,9 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+const formatDate = (date) => {
+  return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+}
 
 app.post('/api/users', async (req, res) => {
   const user = new Usuario({
@@ -56,12 +59,12 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       { _id: id },
       { $push: { log: ejercicio } }
     );
-    res.status(200).json({ 
+    res.status(200).json({
       username: userToSave.username,
       description: ejercicio.description,
       duration: ejercicio.duration,
-      date: ejercicio.date, 
-      _id: id, 
+      date: new Date(ejercicio.date).toDateString(),
+      _id: userToSave._id
     });
     // const ejeToSave = await ejercicio.save();
     // res.status(200).json(userToSave);
