@@ -18,7 +18,7 @@ router.post('/users', async (req, res) => {
   })
   try {
     const userToSave = await user.save();
-    res.status(200).json({username: userToSave.username, _id: userToSave._id});
+    res.json({username: userToSave.username, _id: userToSave._id});
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
@@ -99,18 +99,6 @@ router.get('/users/:_id/logs', async (req, res) => {
       { $unset: "log._id"}
     ]);
     res.status(200).json(logs);
-    // const logs = await Usuario.aggregate([
-    //   {
-    //     $lookup:
-    //     {
-    //       from: 'ejercicios',
-    //       localField: 'userId',
-    //       foreignField: '_id',
-    //       as: 'log'
-    //     }
-    //   }
-    // ]);
-    // res.status(200).json(logs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
