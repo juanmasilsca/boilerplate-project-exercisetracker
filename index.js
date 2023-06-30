@@ -29,13 +29,13 @@ let idCounter = 0;
 
 // })
 
-app.post('api/users', async (req, res) => {
+app.post('/api/users', async (req, res) => {
   const user = new Usuario({
     username: req.body.username,
   })
   try {
     const userToSave = await user.save();
-    res.status(200).json.stringify(userToSave);
+    res.status(200).json({ username: user.username, _id: user._id });
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
