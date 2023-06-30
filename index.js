@@ -107,7 +107,8 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       }},
       { $unset: "log._id"}
     ]);
-    res.send(logs);
+    console.log(logs[0]);
+    res.send(logs[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
