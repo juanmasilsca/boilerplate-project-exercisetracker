@@ -29,7 +29,7 @@ let idCounter = 0;
 
 // })
 
-app.post('/users', async (req, res) => {
+app.post('api/users', async (req, res) => {
   const user = new Usuario({
     username: req.body.username,
   })
