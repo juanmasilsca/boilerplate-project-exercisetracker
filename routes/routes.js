@@ -59,9 +59,9 @@ router.use(bodyParser.json());
 //   }
 // })
 
-const formatDate = (date) => {
-  return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
-}
+// const formatDate = (date) => {
+//   return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+// }
 
 // router.get('/users/:_id/logs', async (req, res) => {
 //   let id = req.params._id;
