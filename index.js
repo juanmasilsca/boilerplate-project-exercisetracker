@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 const formatDate = (date) => {
-  return `${date.getUTCFullYear()}-${date.getUTCMonth()+1}-${date.getUTCDate()}`;
+  return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
 }
 
 app.post('/api/users', async (req, res) => {
@@ -50,11 +50,11 @@ app.get('/api/users', async (req, res) => {
 
 app.post('/api/users/:_id/exercises', async (req, res) => {
   const id = req.params._id;
-  const date = req.body.date ? new Date(req.body.date) : new Date();
+  const date = req.body.date ? req.body.date: formatDate(new Date());
   const ejercicio = new Ejercicio({
     description: req.body.description,
     duration: req.body.duration,
-    date: formatDate(date)
+    date: date
   })
   try {
     const userToSave = await Usuario.findByIdAndUpdate(
@@ -65,7 +65,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       username: userToSave.username,
       description: ejercicio.description,
       duration: ejercicio.duration,
-      date: date.toDateString(),
+      date: date,
       _id: userToSave._id
     });
     // const ejeToSave = await ejercicio.save();
@@ -90,27 +90,28 @@ app.get('/api/users/:_id/logs', async (req, res) => {
         username: 1,
         count: { $size: "$log" },
         _id: 1,
-        //log: 1
-        log: {
-          $filter: {
-            input: "$log",
-            as: "item",
-            cond: {
-              $and: [
-                {
-                  $gte: [ "$$item.date", from ]
-                },
-                {
-                  $lte: [ "$$item.date", to ]
-                }
-              ] 
-            },
-            limit: Number(limit)
-          }
+        log: 1
+        // log: {
+        //   $filter: {
+        //     input: "$log",
+        //     as: "item",
+        //     cond: {
+        //       $and: [
+        //         {
+        //           $gte: [ "$$item.date", from ]
+        //         },
+        //         {
+        //           $lte: [ "$$item.date", to ]
+        //         }
+        //       ] 
+        //     },
+        //     limit: Number(limit)
+        //   }
         } 
-      }},
+      },
       { $unset: "log._id"}
     ]);
+    logs[0].log.filter(e => (new Date(e.date) >= new Date(from) && new Date(e.date) <= new Date(to)));
     let updatedLogs = logs[0].log.map(e => {
       const newLog = {};
       newLog['description'] = e.description;
@@ -121,7 +122,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       return newLog;
     });
     logs[0].log = updatedLogs;
-    console.log(logs[0]);
+    console.log(from);
     res.send(logs[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
