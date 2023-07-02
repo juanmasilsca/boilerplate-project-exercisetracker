@@ -23,6 +23,9 @@ app.get('/', (req, res) => {
 });
 
 const formatDate = (date) => {
+  // const dateParts = date.split('-');
+  // const ISODate = new Date(dateParts[0] + '-' + dateParts[1]-1 + '-' + dateParts[2]);
+  // return ISODate;
   return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
 }
 
@@ -50,11 +53,12 @@ app.get('/api/users', async (req, res) => {
 
 app.post('/api/users/:_id/exercises', async (req, res) => {
   const id = req.params._id;
-  const date = req.body.date ? req.body.date: formatDate(new Date());
+  const paramDate = req.body.date ? req.body.date: formatDate(new Date());
+  const selectedDate = new Date(paramDate).toISOString();
   const ejercicio = new Ejercicio({
     description: req.body.description,
     duration: req.body.duration,
-    date: date
+    date: selectedDate
   })
   try {
     const userToSave = await Usuario.findByIdAndUpdate(
@@ -65,7 +69,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       username: userToSave.username,
       description: ejercicio.description,
       duration: ejercicio.duration,
-      date: new Date(date).toDateString(),
+      date: new Date(selectedDate).toDateString(),
       _id: userToSave._id
     });
     // const ejeToSave = await ejercicio.save();
@@ -78,41 +82,28 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 app.get('/api/users/:_id/logs', async (req, res) => {
   let id = req.params._id;
   const limit = req.query.limit? Number(req.query.limit) : 100;
-  const from = req.query.from ? req.query.from: formatDate(new Date(-8640000000000000));
-  const to = req.query.to ? req.query.to : formatDate(new Date(8640000000000000));
+  const from = req.query.from ? new Date(req.query.from): new Date(-8640000000000000);
+  const to = req.query.to ? new Date(req.query.to) : new Date(8640000000000000);
   //const from = req.query.from ? req.query.from: new Date(-8640000000000000).toISOString();
   //const to = req.query.to ? req.query.to : new Date(8640000000000000).toISOString();
-  console.log(from, to);
   try {
     let logs = await Usuario.aggregate([
       { $match : { _id : new mongoose.Types.ObjectId(id) } },
       { $project: {
-        username: 1,
-        count: { $size: "$log" },
-        _id: 1,
-        log: 1
-        // log: {
-        //   $filter: {
-        //     input: "$log",
-        //     as: "item",
-        //     cond: {
-        //       $and: [
-        //         {
-        //           $gte: [ "$$item.date", from ]
-        //         },
-        //         {
-        //           $lte: [ "$$item.date", to ]
-        //         }
-        //       ] 
-        //     },
-        //     limit: Number(limit)
-        //   }
-        } 
+          username: 1,
+          count: { $size: "$log" },
+          _id: 1,
+          log: {
+            $slice: ['$log', limit]
+          }
+        }
       },
       { $unset: "log._id"}
     ]);
-    logs[0].log.filter(e => (new Date(e.date) >= new Date(from) && new Date(e.date) <= new Date(to)));
-    let updatedLogs = logs[0].log.map(e => {
+    const filteredLogs = logs[0].log
+      .filter(e => new Date(e.date) >= from && new Date(e.date) <= to);
+    
+    let updatedLogs = filteredLogs.map(e => {
       const newLog = {};
       newLog['description'] = e.description;
       newLog['duration'] = e.duration;
@@ -122,7 +113,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       return newLog;
     });
     logs[0].log = updatedLogs;
-    console.log(from);
+    logs.count = updatedLogs.length;
     res.send(logs[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
