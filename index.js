@@ -92,7 +92,6 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       { $match : { _id : new mongoose.Types.ObjectId(id) } },
       { $project: {
           username: 1,
-          count: { $size: "$log" },
           _id: 1,
           from: {
             $cond: [req.query.from, from.toDateString(), '$$REMOVE']
@@ -100,6 +99,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
           to: {
             $cond: [req.query.to, to.toDateString(), '$$REMOVE']
           },
+          count: { $size: "$log" },
           log: {
             $slice: ['$log', limit]
           }
