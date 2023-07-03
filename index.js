@@ -54,12 +54,12 @@ app.get('/api/users', async (req, res) => {
 app.post('/api/users/:_id/exercises', async (req, res) => {
   const id = req.params._id;
   const paramDate = req.body.date ? req.body.date: formatDate(new Date());
-  const selectedDate = new Date(paramDate).toISOString();
-  const ejercicio = new Ejercicio({
+  const selectedDate = new Date(paramDate);
+  const ejercicio = {
     description: req.body.description,
-    duration: req.body.duration,
+    duration: Number(req.body.duration),
     date: selectedDate
-  })
+  }
   try {
     const userToSave = await Usuario.findByIdAndUpdate(
       { _id: id },
@@ -69,7 +69,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       username: userToSave.username,
       description: ejercicio.description,
       duration: ejercicio.duration,
-      date: new Date(selectedDate).toDateString(),
+      date: selectedDate.toDateString(),
       _id: userToSave._id
     });
     // const ejeToSave = await ejercicio.save();
@@ -101,14 +101,24 @@ app.get('/api/users/:_id/logs', async (req, res) => {
           },
           count: { $size: "$log" },
           log: {
-            $slice: ['$log', limit]
+            $filter: {
+              input: '$log',
+              as: 'item',
+              cond: { $and: [
+                { $gte: ['$$item.date', from]},
+                { $lte: ['$$item.date', to]}
+              ]},
+              limit: limit
+            },
+            // date: date.toDateString()
+            //$slice: ['$log', limit]
           }
         }
       },
       { $unset: "log._id"}
     ]);
     const filteredLogs = logs[0].log
-      .filter(e => new Date(e.date) >= from && new Date(e.date) <= to);
+      .filter(e => e.date >= from && e.date <= to);
     let updatedLogs = filteredLogs.map(e => {
       const newLog = {};
       newLog['description'] = e.description;
@@ -119,7 +129,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       return newLog;
     });
     logs[0].log = updatedLogs;
-    logs[0].count = updatedLogs.length;
+    // logs[0].count = updatedLogs.length;
     res.send(logs[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
