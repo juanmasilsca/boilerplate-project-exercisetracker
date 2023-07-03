@@ -129,7 +129,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
       return newLog;
     });
     logs[0].log = updatedLogs;
-    // logs[0].count = updatedLogs.length;
+    logs[0].count = updatedLogs.length;
     res.send(logs[0]);
   } catch (error) {
     res.status(500).json({ message: error.message });
