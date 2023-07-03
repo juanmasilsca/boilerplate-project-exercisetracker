@@ -87,12 +87,19 @@ app.get('/api/users/:_id/logs', async (req, res) => {
   //const from = req.query.from ? req.query.from: new Date(-8640000000000000).toISOString();
   //const to = req.query.to ? req.query.to : new Date(8640000000000000).toISOString();
   try {
+    //let logs = await Usuario.find( { _id: id }, { __v: 0, 'log._id': 0});
     let logs = await Usuario.aggregate([
       { $match : { _id : new mongoose.Types.ObjectId(id) } },
       { $project: {
           username: 1,
           count: { $size: "$log" },
           _id: 1,
+          from: {
+            $cond: [req.query.from, from.toDateString(), '$$REMOVE']
+          },
+          to: {
+            $cond: [req.query.to, to.toDateString(), '$$REMOVE']
+          },
           log: {
             $slice: ['$log', limit]
           }
@@ -102,7 +109,6 @@ app.get('/api/users/:_id/logs', async (req, res) => {
     ]);
     const filteredLogs = logs[0].log
       .filter(e => new Date(e.date) >= from && new Date(e.date) <= to);
-    
     let updatedLogs = filteredLogs.map(e => {
       const newLog = {};
       newLog['description'] = e.description;
